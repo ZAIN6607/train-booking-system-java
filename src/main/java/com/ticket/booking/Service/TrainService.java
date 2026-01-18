@@ -22,46 +22,19 @@ public class TrainService {
     public TrainService() throws IOException {
         File trains = new File(TRAIN_DB_PATH);
 
-        System.out.println("DEBUG: Looking for trains file at -> " + trains.getAbsolutePath());
-
-        if (!trains.exists()) {
-            System.out.println("DEBUG: trains.json FILE DOES NOT EXIST!");
-            trainList = new ArrayList<>();
-            return;
-        }
-
-        if (trains.length() == 0) {
-            System.out.println("DEBUG: trains.json is EMPTY!");
+        if (!trains.exists() || trains.length() == 0) {
             trainList = new ArrayList<>();
             return;
         }
 
         trainList = objectMapper.readValue(trains, new TypeReference<List<Train>>() {});
-
-        System.out.println("DEBUG: Number of trains loaded = " + trainList.size());
     }
-
 
     public List<Train> searchTrains(String source, String destination) {
-
-        System.out.println("DEBUG: Searching for source = " + source + " destination = " + destination);
-
-        System.out.println("DEBUG: Total trains available = " + trainList.size());
-
-        for (Train t : trainList) {
-            System.out.println("DEBUG: Train -> " + t.getTrainId());
-            System.out.println("DEBUG: Stations -> " + t.getStations());
-        }
-
-        List<Train> result = trainList.stream()
+        return trainList.stream()
                 .filter(train -> validTrain(train, source, destination))
                 .collect(Collectors.toList());
-
-        System.out.println("DEBUG: Trains matched = " + result.size());
-
-        return result;
     }
-
 
     public void addTrain(Train newTrain) {
         OptionalInt index = IntStream.range(0, trainList.size())
